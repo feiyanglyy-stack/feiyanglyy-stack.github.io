@@ -8,7 +8,10 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d140e'/%3E%3Cpath d='M16 46 32 14l16 32' fill='none' stroke='%23c99a32' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet" />
+<!-- Google Fonts loads without blocking the first paint: where it is unreachable (e.g. mainland China) the page shows at once in
+     the fallback fonts instead of waiting for the request to time out. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet" /></noscript>
 <style>
   /* Same walnut-and-brass palette as Working Volumes, so the two read as one place. */
   :root {
@@ -174,7 +177,7 @@
   }).catch(() => { $("hero-meta").textContent = "Open the shelf to browse the worlds, films and atlases."; });
 
   // Public repositories, newest activity first.
-  fetch(`https://api.github.com/users/${PROFILE.github}/repos?per_page=100&sort=pushed`)
+  fetch(`https://api.github.com/users/${PROFILE.github}/repos?per_page=100&sort=pushed`, { signal: AbortSignal.timeout(8000) })   // give up after 8 s and show the link instead
     .then((r) => r.ok ? r.json() : Promise.reject(r.status))
     .then((repos) => {
       const list = repos.filter((r) => !r.fork && !r.archived && !PROFILE.hideRepos.includes(r.name));
