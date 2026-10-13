@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Angelina</title>
+<meta name="description" content="Angelina's page: Working Volumes, a shelf of 3D worlds and code-made films, and open-source tools." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d140e'/%3E%3Cpath d='M16 46 32 14l16 32' fill='none' stroke='%23c99a32' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet" />
+<style>
+  /* Same walnut-and-brass palette as Working Volumes, so the two read as one place. */
+  :root {
+    --bg: #1d140e; --bg-1: #241a12; --card: #2a1e15; --card-2: #33251a;
+    --line: #3d2a1c; --line-2: #54402a;
+    --fg: #f3ead6; --fg-2: #cbb894; --fg-3: #a68e6b; --fg-4: #7d6647;
+    --brass: #c99a32; --brass-hi: #e8c86d;
+    --serif: "Fraunces", Georgia, serif; --sans: "Inter", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 3px; border-radius: 6px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  header.top { padding-top: 72px; padding-bottom: 40px; }   /* only top/bottom: .wrap owns the side gutters */
+  .eyebrow { font: 500 11px/1 var(--sans); letter-spacing: .22em; text-transform: uppercase; color: var(--brass); }
+  h1 { font: 600 clamp(44px, 7vw, 76px)/1.02 var(--serif); margin: 14px 0 16px; letter-spacing: -.01em; }
+  .lede { max-width: 620px; color: var(--fg-2); font-size: 18px; margin: 0; }
+  .links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1px solid var(--line-2); border-radius: 999px;
+    color: var(--fg-2); font: 500 13px/1 var(--sans); background: var(--card); transition: border-color .2s, color .2s; }
+  .pill:hover { color: var(--fg); border-color: var(--brass); }
+  .pill.solid { background: var(--brass); border-color: var(--brass); color: #1a120b; }
+  .pill.solid:hover { background: var(--brass-hi); border-color: var(--brass-hi); color: #1a120b; }
+
+  section { padding: 34px 0; border-top: 1px solid var(--line); }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  h2 { font: 600 28px/1.1 var(--serif); margin: 0; }
+  .sec-head a { color: var(--fg-3); font-size: 14px; }
+  .sec-head a:hover { color: var(--brass-hi); }
+
+  /* The museum: one big card */
+  .hero { display: grid; grid-template-columns: 1.35fr 1fr; border: 1px solid var(--line-2); border-radius: 16px; overflow: hidden; background: var(--card); }
+  .hero .img { position: relative; min-height: 320px; background: var(--bg-1); }
+  .hero .img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero .img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 60%, var(--card)); }
+  .hero .txt { padding: 30px 30px 32px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+  .hero h3 { font: 600 34px/1.05 var(--serif); margin: 0; }
+  .hero p { margin: 0; color: var(--fg-2); }
+  .hero .meta { color: var(--fg-4); font-size: 13px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(196px, 100%), 1fr)); gap: 16px; }
+  .grid.repos { grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); }
+  .card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); transition: border-color .2s, transform .2s; }
+  .card:hover { border-color: var(--brass); transform: translateY(-2px); }
+  .card .thumb { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--bg-1); }
+  .card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .kicker { font: 500 10px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--brass); }
+  .card h4 { font: 600 19px/1.2 var(--serif); margin: 0; }
+  .card p { margin: 0; color: var(--fg-3); font-size: 14px; line-height: 1.5;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
+
+  .repo { padding: 16px 18px; gap: 8px; }
+  .repo h4 { font: 600 16px/1.3 var(--sans); }
+  .repo .foot { display: flex; gap: 14px; color: var(--fg-4); font-size: 12px; margin-top: auto; padding-top: 4px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--brass); margin-right: 6px; vertical-align: 0; }
+  .note { color: var(--fg-4); font-size: 14px; }
+
+  footer { padding-top: 24px; padding-bottom: 64px; color: var(--fg-4); font-size: 13px; }
+  footer p { margin: 0; padding-top: 24px; border-top: 1px solid var(--line); }
+
+  @media (max-width: 760px) {
+    header.top { padding-top: 48px; padding-bottom: 28px; }
+    .wrap { padding: 0 16px; }
+    .hero { grid-template-columns: 1fr; }
+    .hero .img { min-height: 200px; }
+    .hero .img::after { background: linear-gradient(180deg, transparent 55%, var(--card)); }
+    .hero .txt { padding: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .card, .card:hover { transition: none; transform: none; } }
+</style>
+</head>
+<body>
+<!-- Everything a visitor reads is in PROFILE below or fetched live: the museum's manifest.json and the public repos on GitHub.
+     Adding a work to the museum or a public repo shows up here without touching this file. -->
+<header class="top wrap">
+  <div class="eyebrow" id="eyebrow"></div>
+  <h1 id="name"></h1>
+  <p class="lede" id="lede"></p>
+  <nav class="links" id="links" aria-label="Links"></nav>
+</header>
+
+<main class="wrap">
+  <section id="museum" aria-labelledby="museum-h">
+    <div class="sec-head"><h2 id="museum-h">The shelf</h2><a id="museum-link">Open Working Volumes →</a></div>
+    <a class="hero" id="hero" aria-label="Open Working Volumes">
+      <div class="img" id="hero-img"></div>
+      <div class="txt">
+        <div class="kicker">3D museum</div>
+        <h3 id="hero-title">Working Volumes</h3>
+        <p id="hero-tag">A shelf of built worlds and the parts they are made of.</p>
+        <div class="meta" id="hero-meta"></div>
+      </div>
+    </a>
+  </section>
+
+  <section id="worlds-sec" aria-labelledby="worlds-h" hidden>
+    <div class="sec-head"><h2 id="worlds-h">Worlds</h2><span class="note">Real-time scenes. They run in the browser and take a few seconds to load.</span></div>
+    <div class="grid" id="worlds"></div>
+  </section>
+
+  <section id="films-sec" aria-labelledby="films-h" hidden>
+    <div class="sec-head"><h2 id="films-h">Films</h2><span class="note">Short films drawn and scored by code.</span></div>
+    <div class="grid" id="films"></div>
+  </section>
+
+  <section id="code-sec" aria-labelledby="code-h">
+    <div class="sec-head"><h2 id="code-h">Code</h2><a id="gh-link">All repositories on GitHub →</a></div>
+    <div class="grid repos" id="repos"><p class="note">Loading public repositories…</p></div>
+  </section>
+</main>
+
+<footer class="wrap"><p id="footer"></p></footer>
+
+<script>
+  const PROFILE = {
+    name: "Angelina",
+    eyebrow: "AngelinaLee · feiyanglyy-stack",
+    lede: "I build small worlds that run in the browser, short films made entirely of code, and tools for working alongside AI agents.",
+    github: "feiyanglyy-stack",
+    museum: "https://feiyanglyy-stack.github.io/atlas-museum/",   // full URL so the page also works when opened locally
+    hideRepos: ["feiyanglyy-stack.github.io"],   // public repos not to list here
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const M = PROFILE.museum, GH = `https://github.com/${PROFILE.github}`;
+
+  $("eyebrow").textContent = PROFILE.eyebrow;
+  $("name").textContent = PROFILE.name;
+  $("lede").textContent = PROFILE.lede;
+  $("links").innerHTML =
+    `<a class="pill solid" href="${M}">Enter Working Volumes</a>` +
+    `<a class="pill" href="${GH}">GitHub</a>`;
+  $("museum-link").href = M; $("hero").href = M; $("gh-link").href = GH;
+  $("footer").textContent = `© ${new Date().getFullYear()} ${PROFILE.name}. Everything on the shelf is a static page; the source is on GitHub.`;
+
+  // The museum's own manifest drives the shelf card, the worlds and the films.
+  fetch(`${M}manifest.json`).then((r) => r.ok ? r.json() : Promise.reject(r.status)).then((m) => {
+    if (m.site) {
+      $("hero-title").textContent = m.site.title || "Working Volumes";
+      if (m.site.tagline) $("hero-tag").textContent = m.site.tagline + ".";
+    }
+    const worlds = [...(m.worlds || [])].sort((a, b) => String(b.added).localeCompare(String(a.added)));
+    const films = [...(m.films || [])].sort((a, b) => String(b.added).localeCompare(String(a.added)));
+    const count = (a, w) => a.length ? `${a.length} ${w}${a.length > 1 ? "s" : ""}` : "";
+    $("hero-meta").textContent = [count(worlds, "world"), count(films, "film"), count(m.atlases || [], "atlas")].filter(Boolean).join(" · ").replace("atlass", "atlases");
+    if (worlds[0]?.still) $("hero-img").innerHTML = `<img src="${M}${esc(worlds[0].still)}" alt="${esc(worlds[0].title)}, the newest world on the shelf">`;
+
+    const card = (it, href) => `
+      <a class="card" href="${href}">
+        <img class="thumb" src="${M}${esc(it.still)}" alt="${esc(it.title)}" loading="lazy">
+        <div class="body">
+          <div class="kicker">${esc(it.kicker || "")}</div>
+          <h4>${esc(it.title)}</h4>
+          <p>${esc(it.blurb || "")}</p>
+        </div>
+      </a>`;
+    if (worlds.length) { $("worlds").innerHTML = worlds.map((w) => card(w, `${M}${w.entry}`)).join(""); $("worlds-sec").hidden = false; }
+    if (films.length) { $("films").innerHTML = films.map((f) => card(f, `${M}viewer/film.html?film=${encodeURIComponent(f.id)}`)).join(""); $("films-sec").hidden = false; }
+  }).catch(() => { $("hero-meta").textContent = "Open the shelf to browse the worlds, films and atlases."; });
+
+  // Public repositories, newest activity first.
+  fetch(`https://api.github.com/users/${PROFILE.github}/repos?per_page=100&sort=pushed`)
+    .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+    .then((repos) => {
+      const list = repos.filter((r) => !r.fork && !r.archived && !PROFILE.hideRepos.includes(r.name));
+      if (!list.length) { $("repos").innerHTML = `<p class="note">No public repositories yet.</p>`; return; }
+      $("repos").innerHTML = list.map((r) => `
+        <a class="card repo" href="${r.html_url}">
+          <h4>${esc(r.name)}</h4>
+          <p>${esc(r.description || "")}</p>
+          <div class="foot">
+            ${r.language ? `<span><span class="dot"></span>${esc(r.language)}</span>` : ""}
+            ${r.stargazers_count ? `<span>★ ${r.stargazers_count}</span>` : ""}
+            <span>Updated ${new Date(r.pushed_at).toLocaleDateString("en", { year: "numeric", month: "short" })}</span>
+          </div>
+        </a>`).join("");
+    })
+    .catch(() => { $("repos").innerHTML = `<p class="note">Couldn't load the list right now. <a href="${GH}" style="color:var(--brass-hi)">See them on GitHub →</a></p>`; });
+</script>
+</body>
+</html>
