@@ -5,6 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Angelina</title>
 <meta name="description" content="Angelina's page: Working Volumes, a shelf of 3D worlds and code-made films, and open-source tools." />
+<link rel="canonical" href="https://feiyanglyy-stack.github.io/" />
+<!-- 分享卡片：X / Slack / 微信抓的是这些标签，不跑 JS，所以写死英文。图是同目录的 og.jpg（1200×630） -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Angelina" />
+<meta property="og:title" content="Angelina — small worlds, code-made films, tools for AI agents" />
+<meta property="og:description" content="Working Volumes, a shelf of real-time 3D worlds and short films made entirely of code, plus open-source tools for working alongside AI agents." />
+<meta property="og:url" content="https://feiyanglyy-stack.github.io/" />
+<meta property="og:image" content="https://feiyanglyy-stack.github.io/og.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Angelina's page, with the Working Volumes bookshelf of 3D worlds and films" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="zh_CN" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Angelina — small worlds, code-made films, tools for AI agents" />
+<meta name="twitter:description" content="Working Volumes, a shelf of real-time 3D worlds and short films made entirely of code, plus open-source tools for working alongside AI agents." />
+<meta name="twitter:image" content="https://feiyanglyy-stack.github.io/og.jpg" />
+<meta name="twitter:image:alt" content="Angelina's page, with the Working Volumes bookshelf of 3D worlds and films" />
+<script>
+  /* 中 / EN：和展陈馆 viewer/i18n.js 同一套规则、同一把 localStorage 钥匙（wv-lang）。两个站线上同一个域名，
+     访客在一边切过，另一边也是这个语言。顺序：链接上的 ?lang=（只管这一次）→ 上次手动选的 → 浏览器首选中文就中文 → 其余英文。 */
+  (function () {
+    const KEY = "wv-lang";
+    const norm = (v) => { v = String(v || "").toLowerCase(); return v.startsWith("zh") ? "zh" : v.startsWith("en") ? "en" : null; };
+    let saved = null; try { saved = norm(localStorage.getItem(KEY)); } catch {}
+    const params = new URLSearchParams(location.search);
+    let lang = norm(params.get("lang")) || saved || (norm((navigator.languages || [])[0] || navigator.language) === "zh" ? "zh" : "en");
+    const listeners = new Set();
+    const stamp = () => { document.documentElement.lang = lang === "zh" ? "zh-CN" : "en"; document.documentElement.dataset.lang = lang; };
+    function set(next, save = true) {
+      next = norm(next); if (!next) return;
+      if (save) try { localStorage.setItem(KEY, next); } catch {}
+      if (params.has("lang") && params.get("lang") !== next) {   // 链接上带着 ?lang= 就一起改，不然刷新又回去
+        params.set("lang", next);
+        const u = new URL(location.href); u.searchParams.set("lang", next); history.replaceState(history.state, "", u);
+      }
+      if (next === lang) return;
+      lang = next; stamp(); listeners.forEach((fn) => fn(lang));
+    }
+    addEventListener("storage", (e) => { if (e.key === KEY && norm(e.newValue)) set(e.newValue, false); });
+    stamp();
+    window.WVLang = {
+      get lang() { return lang; },
+      t: (en, zh) => (lang === "zh" && zh != null ? zh : en),
+      pick: (o, k) => (lang === "zh" && o && o.zh && o.zh[k] ? o.zh[k] : o ? o[k] : undefined),
+      set, on: (fn) => listeners.add(fn),
+    };
+  })();
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d140e'/%3E%3Cpath d='M16 46 32 14l16 32' fill='none' stroke='%23c99a32' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,7 +77,15 @@
   a:focus-visible, button:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 3px; border-radius: 6px; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
-  header.top { padding-top: 72px; padding-bottom: 40px; }   /* only top/bottom: .wrap owns the side gutters */
+  header.top { position: relative; padding-top: 72px; padding-bottom: 40px; }   /* only top/bottom: .wrap owns the side gutters */
+  /* 中 / EN：右上角，和下面的胶囊按钮同一种料 */
+  .lang { position: absolute; top: 24px; right: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px;
+    border: 1px solid var(--line-2); border-radius: 999px; background: var(--card); color: var(--fg-4); cursor: pointer;
+    font: 500 12px/1 var(--sans); letter-spacing: .04em; transition: border-color .2s, color .2s; }
+  .lang:hover { border-color: var(--brass); color: var(--fg-3); }
+  .lang i { font-style: normal; opacity: .6; }
+  .lang [data-l="zh"] { font-size: 13px; }
+  .lang .on { color: var(--brass-hi); }
   .eyebrow { font: 500 11px/1 var(--sans); letter-spacing: .22em; text-transform: uppercase; color: var(--brass); }
   h1 { font: 600 clamp(44px, 7vw, 76px)/1.02 var(--serif); margin: 14px 0 16px; letter-spacing: -.01em; }
   .lede { max-width: 620px; color: var(--fg-2); font-size: 18px; margin: 0; }
@@ -78,6 +135,7 @@
   @media (max-width: 760px) {
     header.top { padding-top: 48px; padding-bottom: 28px; }
     .wrap { padding: 0 16px; }
+    .lang { top: 14px; right: 16px; }
     .hero { grid-template-columns: 1fr; }
     .hero .img { min-height: 200px; }
     .hero .img::after { background: linear-gradient(180deg, transparent 55%, var(--card)); }
@@ -90,6 +148,7 @@
 <!-- Everything a visitor reads is in PROFILE below or fetched live: the museum's manifest.json and the public repos on GitHub.
      Adding a work to the museum or a public repo shows up here without touching this file. -->
 <header class="top wrap">
+  <button class="lang" id="lang" type="button"><span data-l="zh" lang="zh-CN">中</span><i aria-hidden="true">/</i><span data-l="en" lang="en">EN</span></button>
   <div class="eyebrow" id="eyebrow"></div>
   <h1 id="name"></h1>
   <p class="lede" id="lede"></p>
@@ -102,7 +161,7 @@
     <a class="hero" id="hero" aria-label="Open Working Volumes">
       <div class="img" id="hero-img"></div>
       <div class="txt">
-        <div class="kicker">3D museum</div>
+        <div class="kicker" id="hero-kicker">3D museum</div>
         <h3 id="hero-title">Working Volumes</h3>
         <p id="hero-tag">A shelf of built worlds and the parts they are made of.</p>
         <div class="meta" id="hero-meta"></div>
@@ -111,12 +170,12 @@
   </section>
 
   <section id="worlds-sec" aria-labelledby="worlds-h" hidden>
-    <div class="sec-head"><h2 id="worlds-h">Worlds</h2><span class="note">Real-time scenes. They run in the browser and take a few seconds to load.</span></div>
+    <div class="sec-head"><h2 id="worlds-h">Worlds</h2><span class="note" id="worlds-note">Real-time scenes. They run in the browser and take a few seconds to load.</span></div>
     <div class="grid" id="worlds"></div>
   </section>
 
   <section id="films-sec" aria-labelledby="films-h" hidden>
-    <div class="sec-head"><h2 id="films-h">Films</h2><span class="note">Short films drawn and scored by code.</span></div>
+    <div class="sec-head"><h2 id="films-h">Films</h2><span class="note" id="films-note">Short films drawn and scored by code.</span></div>
     <div class="grid" id="films"></div>
   </section>
 
@@ -133,67 +192,114 @@
     name: "Angelina",
     eyebrow: "AngelinaLee · feiyanglyy-stack",
     lede: "I build small worlds that run in the browser, short films made entirely of code, and tools for working alongside AI agents.",
+    zh: { lede: "我做能在浏览器里跑的小世界、完全用代码做出来的短片，还有和 AI agent 一起干活用的工具。" },
     github: "feiyanglyy-stack",
     museum: "https://feiyanglyy-stack.github.io/atlas-museum/",   // full URL so the page also works when opened locally
-    hideRepos: ["feiyanglyy-stack.github.io"],   // public repos not to list here
+    hideRepos: ["feiyanglyy-stack.github.io", "feiyanglyy-stack"],   // public repos not to list here (this page, the GitHub profile README)
   };
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const T = (en, zh) => WVLang.t(en, zh), P = (o, k) => WVLang.pick(o, k);
   const M = PROFILE.museum, GH = `https://github.com/${PROFILE.github}`;
+  const state = { manifest: null, manifestFailed: false, repos: null, reposFailed: false };   // what the fetches brought back; paint() redraws from it
 
-  $("eyebrow").textContent = PROFILE.eyebrow;
-  $("name").textContent = PROFILE.name;
-  $("lede").textContent = PROFILE.lede;
-  $("links").innerHTML =
-    `<a class="pill solid" href="${M}">Enter Working Volumes</a>` +
-    `<a class="pill" href="${GH}">GitHub</a>`;
-  $("museum-link").href = M; $("hero").href = M; $("gh-link").href = GH;
-  $("footer").textContent = `© ${new Date().getFullYear()} ${PROFILE.name}. Everything on the shelf is a static page; the source is on GitHub.`;
+  // Everything a visitor reads is painted here, so switching 中 / EN just calls paint() again.
+  function paint() {
+    $("eyebrow").textContent = PROFILE.eyebrow;
+    $("name").textContent = PROFILE.name;
+    $("lede").textContent = P(PROFILE, "lede");
+    $("links").innerHTML =
+      `<a class="pill solid" href="${M}">${T("Enter Working Volumes", "进入 Working Volumes")}</a>` +
+      `<a class="pill" href="${GH}">GitHub</a>`;
+    $("museum-h").textContent = T("The shelf", "书架");
+    $("museum-link").textContent = T("Open Working Volumes →", "打开 Working Volumes →");
+    $("hero").setAttribute("aria-label", T("Open Working Volumes", "打开 Working Volumes"));
+    $("hero-kicker").textContent = T("3D museum", "3D 展陈馆");
+    $("worlds-h").textContent = T("Worlds", "世界");
+    $("worlds-note").textContent = T("Real-time scenes. They run in the browser and take a few seconds to load.", "实时场景，直接在浏览器里运行，打开要等几秒。");
+    $("films-h").textContent = T("Films", "短片");
+    $("films-note").textContent = T("Short films drawn and scored by code.", "画面和配乐都由代码生成的短片。");
+    $("code-h").textContent = T("Code", "代码");
+    $("gh-link").textContent = T("All repositories on GitHub →", "GitHub 上的全部仓库 →");
+    $("footer").textContent = T(`© ${new Date().getFullYear()} ${PROFILE.name}. Everything on the shelf is a static page; the source is on GitHub.`,
+      `© ${new Date().getFullYear()} ${PROFILE.name}。书架上的每样东西都是静态网页，源码都在 GitHub 上。`);
+    paintShelf(); paintRepos();
+    const b = $("lang"), label = T("切换到中文", "Switch to English");   // written in the language it switches to
+    b.querySelectorAll("[data-l]").forEach((s) => s.classList.toggle("on", s.dataset.l === WVLang.lang));
+    b.setAttribute("aria-label", label); b.title = label;
+  }
 
   // The museum's own manifest drives the shelf card, the worlds and the films.
-  fetch(`${M}manifest.json`).then((r) => r.ok ? r.json() : Promise.reject(r.status)).then((m) => {
+  function paintShelf() {
+    const m = state.manifest;
+    if (!m) {
+      $("hero-title").textContent = "Working Volumes";
+      $("hero-tag").textContent = T("A shelf of built worlds and the parts they are made of.", "一架书：搭好的世界，和搭成它们的零件。");
+      $("hero-meta").textContent = state.manifestFailed ? T("Open the shelf to browse the worlds, films and atlases.", "打开书架，看看里面的世界、短片和图集。") : "";
+      return;
+    }
     if (m.site) {
-      $("hero-title").textContent = m.site.title || "Working Volumes";
-      if (m.site.tagline) $("hero-tag").textContent = m.site.tagline + ".";
+      $("hero-title").textContent = P(m.site, "title") || "Working Volumes";
+      const tag = P(m.site, "tagline");
+      if (tag) $("hero-tag").textContent = tag + (/[㐀-鿿]/.test(tag) ? "。" : ".");   // the museum may not have a Chinese tagline yet
     }
     const worlds = [...(m.worlds || [])].sort((a, b) => String(b.added).localeCompare(String(a.added)));
     const films = [...(m.films || [])].sort((a, b) => String(b.added).localeCompare(String(a.added)));
-    const count = (a, w) => a.length ? `${a.length} ${w}${a.length > 1 ? "s" : ""}` : "";
-    $("hero-meta").textContent = [count(worlds, "world"), count(films, "film"), count(m.atlases || [], "atlas")].filter(Boolean).join(" · ").replace("atlass", "atlases");
-    if (worlds[0]?.still) $("hero-img").innerHTML = `<img src="${M}${esc(worlds[0].still)}" alt="${esc(worlds[0].title)}, the newest world on the shelf">`;
+    const atlases = m.atlases || [];
+    const count = (n, en, zh) => n ? T(`${n} ${en}${n > 1 ? (en === "atlas" ? "es" : "s") : ""}`, `${n} ${zh}`) : "";
+    $("hero-meta").textContent = [count(worlds.length, "world", "个世界"), count(films.length, "film", "部短片"), count(atlases.length, "atlas", "本图集")].filter(Boolean).join(" · ");
+    if (worlds[0]?.still) {
+      const t = P(worlds[0], "title");
+      $("hero-img").innerHTML = `<img src="${M}${esc(worlds[0].still)}" alt="${esc(T(`${t}, the newest world on the shelf`, `书架上最新的世界：${t}`))}">`;
+    }
 
     const card = (it, href) => `
       <a class="card" href="${href}">
-        <img class="thumb" src="${M}${esc(it.still)}" alt="${esc(it.title)}" loading="lazy">
+        <img class="thumb" src="${M}${esc(it.still)}" alt="${esc(P(it, "title"))}" loading="lazy">
         <div class="body">
-          <div class="kicker">${esc(it.kicker || "")}</div>
-          <h4>${esc(it.title)}</h4>
-          <p>${esc(it.blurb || "")}</p>
+          <div class="kicker">${esc(P(it, "kicker") || "")}</div>
+          <h4>${esc(P(it, "title"))}</h4>
+          <p>${esc(P(it, "blurb") || "")}</p>
         </div>
       </a>`;
     if (worlds.length) { $("worlds").innerHTML = worlds.map((w) => card(w, `${M}${w.entry}`)).join(""); $("worlds-sec").hidden = false; }
     if (films.length) { $("films").innerHTML = films.map((f) => card(f, `${M}viewer/film.html?film=${encodeURIComponent(f.id)}`)).join(""); $("films-sec").hidden = false; }
-  }).catch(() => { $("hero-meta").textContent = "Open the shelf to browse the worlds, films and atlases."; });
+  }
 
-  // Public repositories, newest activity first.
+  // Public repositories, newest activity first. Descriptions are whatever the repo says (English).
+  function paintRepos() {
+    if (state.reposFailed) { $("repos").innerHTML = `<p class="note">${T("Couldn't load the list right now.", "暂时读不到仓库列表。")} <a href="${GH}" style="color:var(--brass-hi)">${T("See them on GitHub →", "去 GitHub 看 →")}</a></p>`; return; }
+    if (!state.repos) { $("repos").innerHTML = `<p class="note">${T("Loading public repositories…", "正在读取公开仓库…")}</p>`; return; }
+    const list = state.repos.filter((r) => !r.fork && !r.archived && !PROFILE.hideRepos.includes(r.name));
+    if (!list.length) { $("repos").innerHTML = `<p class="note">${T("No public repositories yet.", "还没有公开仓库。")}</p>`; return; }
+    const month = (d) => new Date(d).toLocaleDateString(WVLang.lang === "zh" ? "zh-CN" : "en", { year: "numeric", month: WVLang.lang === "zh" ? "long" : "short" });
+    $("repos").innerHTML = list.map((r) => `
+      <a class="card repo" href="${r.html_url}">
+        <h4>${esc(r.name)}</h4>
+        <p>${esc(r.description || "")}</p>
+        <div class="foot">
+          ${r.language ? `<span><span class="dot"></span>${esc(r.language)}</span>` : ""}
+          ${r.stargazers_count ? `<span>★ ${r.stargazers_count}</span>` : ""}
+          <span>${T(`Updated ${month(r.pushed_at)}`, `更新于 ${month(r.pushed_at)}`)}</span>
+        </div>
+      </a>`).join("");
+  }
+
+  $("museum-link").href = M; $("hero").href = M; $("gh-link").href = GH;
+  $("lang").addEventListener("click", (e) => { WVLang.set(WVLang.lang === "zh" ? "en" : "zh"); if (e.detail > 0) e.currentTarget.blur(); });
+  WVLang.on(paint);
+  paint();
+
+  fetch(`${M}manifest.json`).then((r) => r.ok ? r.json() : Promise.reject(r.status))
+    .then((m) => { state.manifest = m; })
+    .catch(() => { state.manifestFailed = true; })
+    .finally(paintShelf);
   fetch(`https://api.github.com/users/${PROFILE.github}/repos?per_page=100&sort=pushed`, { signal: AbortSignal.timeout(8000) })   // give up after 8 s and show the link instead
     .then((r) => r.ok ? r.json() : Promise.reject(r.status))
-    .then((repos) => {
-      const list = repos.filter((r) => !r.fork && !r.archived && !PROFILE.hideRepos.includes(r.name));
-      if (!list.length) { $("repos").innerHTML = `<p class="note">No public repositories yet.</p>`; return; }
-      $("repos").innerHTML = list.map((r) => `
-        <a class="card repo" href="${r.html_url}">
-          <h4>${esc(r.name)}</h4>
-          <p>${esc(r.description || "")}</p>
-          <div class="foot">
-            ${r.language ? `<span><span class="dot"></span>${esc(r.language)}</span>` : ""}
-            ${r.stargazers_count ? `<span>★ ${r.stargazers_count}</span>` : ""}
-            <span>Updated ${new Date(r.pushed_at).toLocaleDateString("en", { year: "numeric", month: "short" })}</span>
-          </div>
-        </a>`).join("");
-    })
-    .catch(() => { $("repos").innerHTML = `<p class="note">Couldn't load the list right now. <a href="${GH}" style="color:var(--brass-hi)">See them on GitHub →</a></p>`; });
+    .then((repos) => { state.repos = repos; })
+    .catch(() => { state.reposFailed = true; })
+    .finally(paintRepos);
 </script>
 </body>
 </html>
